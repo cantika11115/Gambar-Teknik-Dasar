@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gambar Teknik Dasar - Media Pembelajaran Interaktif</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pink: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                        },
+                        rose: {
+                            500: '#f43f5e',
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Montserrat', 'sans-serif'],
+                        body: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fff5f7;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .font-heading {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff1f2;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #fda4af;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f43f5e;
+        }
+
+        /* Subtle Glow Effects */
+        .glow-pink {
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.25);
+        }
+
+        .btn-bounce:active {
+            transform: scale(0.95);
+        }
+
+        /* Animated SVG Lines */
+        @keyframes strokeDash {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .animate-draw {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: strokeDash 2s ease-in-out forwards;
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-pink-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between selection:bg-pink-300 selection:text-pink-900 overflow-x-hidden">
+
+    <!-- TOP NAVIGATION HEADER -->
+    <header class="sticky top-0 z-50 glass-card border-b border-pink-200 px-4 py-3 shadow-sm">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-3">
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('beranda')">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white shadow-md shadow-pink-300">
+                    <i class="fa-solid fa-compass-drafting text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading font-extrabold text-base sm:text-lg text-slate-800 leading-tight">Teknik<span class="text-pink-600">Pedia</span></h1>
+                    <p class="text-xs text-pink-500 font-medium hidden sm:block">Gambar Teknik Dasar Interaktif</p>
+                </div>
+            </div>
+
+            <!-- Progress Bar Tracker -->
+            <div class="flex-1 max-w-xs mx-2">
+                <div class="flex justify-between items-center text-xs text-pink-700 font-semibold mb-1">
+                    <span><i class="fa-solid fa-trophy text-amber-400 mr-1"></i> Progres</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="w-full bg-pink-100 rounded-full h-2.5 overflow-hidden border border-pink-200">
+                    <div id="progress-bar-fill" class="bg-gradient-to-r from-pink-400 to-pink-600 h-2.5 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Sound Toggle & Mobile Menu Btn -->
+            <div class="flex items-center space-x-2">
+                <button id="audio-btn" onclick="toggleAudio()" class="w-9 h-9 rounded-xl bg-pink-100 text-pink-600 hover:bg-pink-200 transition flex items-center justify-center border border-pink-200" title="Suara FX On/Off">
+                    <i class="fa-solid fa-volume-high text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 sm:p-6 mb-16 sm:mb-0">
+
+        <!-- TAB 1: BERANDA -->
+        <section id="tab-beranda" class="tab-content block space-y-6 animate-fade-in">
+            <!-- Hero Card -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-pink-500 via-rose-500 to-pink-600 text-white p-6 sm:p-10 shadow-xl shadow-pink-200">
+                <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-2xl space-y-4">
+                    <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md text-white rounded-full text-xs font-semibold tracking-wide">
+                        <i class="fa-solid fa-sparkles mr-1"></i> Media Pembelajaran SMK / Teknik
+                    </span>
+                    <h2 class="font-heading font-black text-2xl sm:text-4xl leading-tight">
+                        Kuasai Fondasi <br><span class="text-pink-100 underline decoration-pink-300">Gambar Teknik Dasar</span>
+                    </h2>
+                    <p class="text-pink-50 text-sm sm:text-base leading-relaxed">
+                        Pelajari standar ISO, penggunaan alat khusus, jenis-jenis garis, hingga etiket gambar secara visual, interaktif, dan menyenangkan!
+                    </p>
+                    <div class="pt-2 flex flex-wrap gap-3">
+                        <button onclick="switchTab('peralatan')" class="btn-bounce bg-white text-pink-600 font-bold px-6 py-3 rounded-2xl shadow-lg hover:bg-pink-50 transition flex items-center gap-2">
+                            <span>Mulai Belajar</span>
+                            <i class="fa-solid fa-circle-arrow-right"></i>
+                        </button>
+                        <button onclick="switchTab('kuis')" class="btn-bounce bg-pink-700/40 border border-white/30 text-white font-semibold px-5 py-3 rounded-2xl hover:bg-pink-700/60 transition flex items-center gap-2">
+                            <i class="fa-solid fa-gamepad"></i>
+                            <span>Uji Kuis</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fitur Utama Grid -->
+            <div>
+                <h3 class="font-heading font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-pink-500"></i> Peta Modul Belajar
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                    <!-- Cards -->
+                    <div onclick="switchTab('peralatan')" class="glass-card p-4 rounded-2xl border border-pink-100 hover:border-pink-300 hover:shadow-md transition cursor-pointer group">
+                        <div class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-pen-ruler text-xl"></i>
+                        </div>
+                        <h4 class="font-heading font-bold text-slate-800 text-sm">Peralatan Teknik</h4>
+                        <p class="text-xs text-slate-500 mt-1">Pensil, Jangka, Busur & Meja Gambar</p>
+                    </div>
+
+                    <div onclick="switchTab('garis')" class="glass-card p-4 rounded-2xl border border-pink-100 hover:border-pink-300 hover:shadow-md transition cursor-pointer group">
+                        <div class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-grip-lines text-xl"></i>
+                        </div>
+                        <h4 class="font-heading font-bold text-slate-800 text-sm">Jenis Garis ISO</h4>
+                        <p class="text-xs text-slate-500 mt-1">Garis Kontinu, Putus, Titik & Standar</p>
+                    </div>
+
+                    <div onclick="switchTab('kertas')" class="glass-card p-4 rounded-2xl border border-pink-100 hover:border-pink-300 hover:shadow-md transition cursor-pointer group">
+                        <div class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-scroll text-xl"></i>
+                        </div>
+                        <h4 class="font-heading font-bold text-slate-800 text-sm">Kertas & Etiket</h4>
+                        <p class="text-xs text-slate-500 mt-1">Ukuran A0-A4 & Kepala Gambar</p>
+                    </div>
+
+                    <div onclick="switchTab('lab')" class="glass-card p-4 rounded-2xl border border-pink-100 hover:border-pink-300 hover:shadow-md transition cursor-pointer group">
+                        <div class="w-12 h-12 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-flask-vial text-xl"></i>
+                        </div>
+                        <h4 class="font-heading font-bold text-slate-800 text-sm">Lab Simulasi</h4>
+                        <p class="text-xs text-slate-500 mt-1">Praktik Coba Menggambar Langsung</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: PERALATAN GAMBAR TEKNIK -->
+        <section id="tab-peralatan" class="tab-content hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-heading font-black text-2xl text-slate-800">Peralatan Gambar Teknik</h2>
+                    <p class="text-xs sm:text-sm text-pink-600 font-medium">Klik pada alat untuk mempelajari cara dan fungsinya</p>
+                </div>
+                <span class="text-xs bg-pink-100 text-pink-700 px-3 py-1 rounded-full font-semibold">Modul 01</span>
+            </div>
+
+            <!-- List Peralatan -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Tool 1: Pensil -->
+                <div class="glass-card p-5 rounded-3xl border border-pink-100 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-start gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-pink-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-pink-200">
+                            <i class="fa-solid fa-pencil text-2xl"></i>
+                        </div>
+                        <div class="space-y-2 flex-grow">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-heading font-bold text-base text-slate-800">Pensil Gambar (Kekerasan)</h3>
+                                <button onclick="markComplete('tool1', this)" class="text-slate-300 hover:text-pink-500 transition text-lg"><i class="fa-solid fa-circle-check"></i></button>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Pensil teknik dikelompokkan berdasarkan tingkat kekerasan garisnya:
+                            </p>
+                            <!-- Badges -->
+                            <div class="flex flex-wrap gap-2 text-xs pt-1">
+                                <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-lg font-medium border border-slate-200">Keras: 4H - 9H (Garis Tipis)</span>
+                                <span class="px-2 py-1 bg-pink-100 text-pink-800 rounded-lg font-medium border border-pink-200">Sedang: F, H, HB (Sketsa/Tulisan)</span>
+                                <span class="px-2 py-1 bg-slate-800 text-white rounded-lg font-medium">Lunak: B - 7B (Tebal/Arsir)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tool 2: Penggaris T & Siku -->
+                <div class="glass-card p-5 rounded-3xl border border-pink-100 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-start gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-pink-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-pink-200">
+                            <i class="fa-solid fa-ruler-combined text-2xl"></i>
+                        </div>
+                        <div class="space-y-2 flex-grow">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-heading font-bold text-base text-slate-800">Penggaris Segitiga & T-Square</h3>
+                                <button onclick="markComplete('tool2', this)" class="text-slate-300 hover:text-pink-500 transition text-lg"><i class="fa-solid fa-circle-check"></i></button>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Sepasang penggaris segitiga (30°-60° dan 45°-45°) digunakan untuk membuat garis sejajar, tegak lurus, dan sudut-sudut standar.
+                            </p>
+                            <div class="bg-pink-50 p-2.5 rounded-xl border border-pink-200 text-xs text-pink-800 font-medium">
+                                <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> Tip: Kombinasi dua segitiga dapat menghasilkan sudut kelipatan 15°.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tool 3: Jangka -->
+                <div class="glass-card p-5 rounded-3xl border border-pink-100 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-start gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-pink-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-pink-200">
+                            <i class="fa-solid fa-compass text-2xl"></i>
+                        </div>
+                        <div class="space-y-2 flex-grow">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-heading font-bold text-base text-slate-800">Jangka Gambar</h3>
+                                <button onclick="markComplete('tool3', this)" class="text-slate-300 hover:text-pink-500 transition text-lg"><i class="fa-solid fa-circle-check"></i></button>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Digunakan untuk membuat lingkaran atau busur lingkaran. Pastikan jarum penusuk dan ujung pensil sejajar saat digunakan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tool 4: Busur Derajat -->
+                <div class="glass-card p-5 rounded-3xl border border-pink-100 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-start gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-pink-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-pink-200">
+                            <i class="fa-solid fa-circle-half-stroke text-2xl"></i>
+                        </div>
+                        <div class="space-y-2 flex-grow">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-heading font-bold text-base text-slate-800">Busur Derajat</h3>
+                                <button onclick="markComplete('tool4', this)" class="text-slate-300 hover:text-pink-500 transition text-lg"><i class="fa-solid fa-circle-check"></i></button>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Alat pengukur sudut dari 0° hingga 180° (atau 360°). Sangat krusial untuk membuat kemiringan objek yang presisi.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: JENIS GARIS TEKNIK -->
+        <section id="tab-garis" class="tab-content hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-heading font-black text-2xl text-slate-800">Jenis Garis Standar ISO</h2>
+                    <p class="text-xs sm:text-sm text-pink-600 font-medium">Setiap jenis garis memiliki arti dan kegunaan khusus</p>
+                </div>
+                <span class="text-xs bg-pink-100 text-pink-700 px-3 py-1 rounded-full font-semibold">Modul 02</span>
+            </div>
+
+            <!-- Interactive Visual Lines Demo -->
+            <div class="space-y-4">
+                <!-- Line Item 1 -->
+                <div class="glass-card p-4 rounded-2xl border border-pink-100 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-heading font-bold text-slate-800 text-sm">1. Garis Tebal Kontinu (Continuous Thick)</h3>
+                        <span class="text-xs bg-slate-800 text-white px-2 py-0.5 rounded">Tebal 0.5 - 0.7 mm</span>
+                    </div>
+                    <!-- SVG Demo Canvas -->
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-center h-16">
+                        <svg class="w-full h-8">
+                            <line x1="10" y1="16" x2="95%" y2="16" stroke="#1e293b" stroke-width="5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-slate-600"><span class="font-semibold text-pink-600">Kegunaan:</span> Garis benda nyata/terlihat, garis tepi kertas gambar.</p>
+                </div>
+
+                <!-- Line Item 2 -->
+                <div class="glass-card p-4 rounded-2xl border border-pink-100 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-heading font-bold text-slate-800 text-sm">2. Garis Tipis Kontinu (Continuous Thin)</h3>
+                        <span class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded font-semibold">Tipis 0.25 - 0.35 mm</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-center h-16">
+                        <svg class="w-full h-8">
+                            <line x1="10" y1="16" x2="95%" y2="16" stroke="#64748b" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-slate-600"><span class="font-semibold text-pink-600">Kegunaan:</span> Garis ukur, garis bantu, garis arsir, dan garis penunjuk.</p>
+                </div>
+
+                <!-- Line Item 3 -->
+                <div class="glass-card p-4 rounded-2xl border border-pink-100 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-heading font-bold text-slate-800 text-sm">3. Garis Gores / Putus-Putus (Dashed Line)</h3>
+                        <span class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded font-semibold">Sedang 0.35 mm</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-center h-16">
+                        <svg class="w-full h-8">
+                            <line x1="10" y1="16" x2="95%" y2="16" stroke="#f43f5e" stroke-width="3" stroke-dasharray="12, 6" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-slate-600"><span class="font-semibold text-pink-600">Kegunaan:</span> Garis benda terhalang atau garis tersembunyi (tidak kelihatan langsung).</p>
+                </div>
+
+                <!-- Line Item 4 -->
+                <div class="glass-card p-4 rounded-2xl border border-pink-100 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-heading font-bold text-slate-800 text-sm">4. Garis Bergores Titik / Sumbu (Chain Thin)</h3>
+                        <span class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded font-semibold">Tipis 0.25 mm</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-center h-16">
+                        <svg class="w-full h-8">
+                            <line x1="10" y1="16" x2="95%" y2="16" stroke="#e11d48" stroke-width="2" stroke-dasharray="20, 5, 4, 5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-slate-600"><span class="font-semibold text-pink-600">Kegunaan:</span> Garis sumbu simetri, garis lintasan, dan posisi simetris.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: KERTAS & ETIKET GAMBAR -->
+        <section id="tab-kertas" class="tab-content hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-heading font-black text-2xl text-slate-800">Ukuran Kertas & Etiket</h2>
+                    <p class="text-xs sm:text-sm text-pink-600 font-medium">Standar ISO dimensi kertas gambar dan Kepala Gambar (Etiket)</p>
+                </div>
+                <span class="text-xs bg-pink-100 text-pink-700 px-3 py-1 rounded-full font-semibold">Modul 03</span>
+            </div>
+
+            <!-- Interactive Paper Visualizer -->
+            <div class="glass-card p-5 rounded-3xl border border-pink-100 space-y-4">
+                <h3 class="font-heading font-bold text-slate-800 text-base">Perbandingan Ukuran Kertas Seri A</h3>
+                <p class="text-xs text-slate-600">Pilih kertas untuk melihat dimensi resminya (dalam mm):</p>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    <button onclick="selectPaper('A0')" class="paper-btn p-3 rounded-xl border text-center font-bold text-xs bg-white text-slate-700 hover:border-pink-500 hover:text-pink-600 transition">A0</button>
+                    <button onclick="selectPaper('A1')" class="paper-btn p-3 rounded-xl border text-center font-bold text-xs bg-white text-slate-700 hover:border-pink-500 hover:text-pink-600 transition">A1</button>
+                    <button onclick="selectPaper('A2')" class="paper-btn p-3 rounded-xl border text-center font-bold text-xs bg-white text-slate-700 hover:border-pink-500 hover:text-pink-600 transition">A2</button>
+                    <button onclick="selectPaper('A3')" class="paper-btn p-3 rounded-xl border text-center font-bold text-xs bg-white text-slate-700 hover:border-pink-500 hover:text-pink-600 transition">A3</button>
+                    <button onclick="selectPaper('A4')" id="default-paper" class="paper-btn p-3 rounded-xl border-2 border-pink-500 text-center font-bold text-xs bg-pink-50 text-pink-600 transition shadow-sm">A4</button>
+                </div>
+
+                <!-- Details Display -->
+                <div id="paper-info" class="bg-pink-50/70 p-4 rounded-2xl border border-pink-200 flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <div class="space-y-1 text-center sm:text-left">
+                        <span id="paper-title" class="font-heading font-extrabold text-pink-600 text-lg">Kertas A4</span>
+                        <p id="paper-dim" class="text-xs text-slate-700 font-semibold">Ukuran: 210 x 297 mm</p>
+                        <p id="paper-border" class="text-xs text-slate-500">Garis Tepi (Margin Left): 20 mm | Tepi Lain: 10 mm</p>
+                    </div>
+                    <div class="w-20 h-28 bg-white border-2 border-pink-400 rounded-md shadow-inner flex items-end justify-end p-1 text-[8px] text-pink-400 font-mono">
+                        Etiket
+                    </div>
+                </div>
+            </div>
+
+            <!-- Etiket Component breakdown -->
+            <div class="glass-card p-5 rounded-3xl border border-pink-100 space-y-4">
+                <h3 class="font-heading font-bold text-slate-800 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-id-card text-pink-500"></i> Komponen Etiket (Kepala Gambar)
+                </h3>
+                <p class="text-xs text-slate-600">Etiket wajib berada di **sudut kanan bawah** lembar kerja. Komponen utamanya:</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                        <span class="font-bold text-pink-600 block mb-1">1. Judul / Nama Gambar</span>
+                        <span class="text-slate-500">Nama komponen atau rancangan objek teknik.</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                        <span class="font-bold text-pink-600 block mb-1">2. Skala Gambar</span>
+                        <span class="text-slate-500">Rasio ukuran (misal 1:1, 1:2, atau 5:1).</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                        <span class="font-bold text-pink-600 block mb-1">3. Nama Instansi / Drafter</span>
+                        <span class="text-slate-500">Nama pembuat gambar & nama sekolah/perusahaan.</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                        <span class="font-bold text-pink-600 block mb-1">4. Satuan & Proyeksi</span>
+                        <span class="text-slate-500">Satuan (mm) dan simbol proyeksi (Eropa/Amerika).</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: STUDIO LAB SIMULASI -->
+        <section id="tab-lab" class="tab-content hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-heading font-black text-2xl text-slate-800">Lab Simulasi Interaktif</h2>
+                    <p class="text-xs sm:text-sm text-pink-600 font-medium">Uji coba menarik garis dan menggambar pada kanvas digital</p>
+                </div>
+                <span class="text-xs bg-pink-100 text-pink-700 px-3 py-1 rounded-full font-semibold">Praktik</span>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="glass-card p-4 rounded-3xl border border-pink-100 space-y-4">
+                <!-- Controls Toolbar -->
+                <div class="flex flex-wrap items-center justify-between gap-2 bg-pink-50 p-3 rounded-2xl border border-pink-200">
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-bold text-slate-700">Jenis Line:</label>
+                        <select id="lab-line-style" class="text-xs bg-white border border-pink-300 rounded-lg p-2 font-medium focus:outline-none focus:border-pink-500">
+                            <option value="solid">Tebal Kontinu (0.5mm)</option>
+                            <option value="thin">Tipis Kontinu (0.2mm)</option>
+                            <option value="dashed">Garis Gores / Putus</option>
+                            <option value="center">Garis Sumbu / Titik</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="clearCanvas()" class="text-xs bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 px-3 py-2 rounded-xl font-bold transition flex items-center gap-1">
+                            <i class="fa-solid fa-eraser"></i> Bersihkan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Canvas -->
+                <div class="relative w-full h-64 sm:h-80 bg-white rounded-2xl border-2 border-dashed border-pink-300 overflow-hidden shadow-inner cursor-crosshair">
+                    <canvas id="drawing-canvas" class="w-full h-full block"></canvas>
+                </div>
+                <p class="text-center text-xs text-slate-400">Gunakan sentuhan jari atau mouse untuk menggambar di atas kertas grid digital.</p>
+            </div>
+        </section>
+
+        <!-- TAB 6: KUIS INTERAKTIF -->
+        <section id="tab-kuis" class="tab-content hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-heading font-black text-2xl text-slate-800">Kuis Evaluasi</h2>
+                    <p class="text-xs sm:text-sm text-pink-600 font-medium">Uji pemahaman Anda tentang gambar teknik dasar</p>
+                </div>
+                <span id="quiz-step" class="text-xs bg-pink-100 text-pink-700 px-3 py-1 rounded-full font-bold">Soal 1/5</span>
+            </div>
+
+            <!-- Quiz Card Container -->
+            <div id="quiz-container" class="glass-card p-6 rounded-3xl border border-pink-100 shadow-md space-y-6">
+                <!-- Question -->
+                <h3 id="quiz-question" class="font-heading font-bold text-slate-800 text-base sm:text-lg">
+                    Memuat pertanyaan...
+                </h3>
+
+                <!-- Options -->
+                <div id="quiz-options" class="grid grid-cols-1 gap-3">
+                    <!-- Option buttons populated by JS -->
+                </div>
+
+                <!-- Feedback Message -->
+                <div id="quiz-feedback" class="hidden p-4 rounded-2xl text-xs font-semibold"></div>
+
+                <!-- Next Button -->
+                <div class="flex justify-end pt-2">
+                    <button id="next-quiz-btn" onclick="nextQuestion()" class="hidden btn-bounce bg-pink-600 hover:bg-pink-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 text-xs">
+                        <span>Selanjutnya</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Result Card (Hidden by default) -->
+            <div id="quiz-result" class="hidden glass-card p-8 rounded-3xl border border-pink-200 text-center space-y-4">
+                <div class="w-20 h-20 mx-auto rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-3xl shadow-inner">
+                    <i id="result-icon" class="fa-solid fa-trophy"></i>
+                </div>
+                <h3 class="font-heading font-black text-2xl text-slate-800">Hasil Kuis Anda</h3>
+                <p id="result-score" class="text-3xl font-extrabold text-pink-600">0 / 100</p>
+                <p id="result-msg" class="text-xs text-slate-600 max-w-sm mx-auto">
+                    Selamat! Anda telah menyelesaikan evaluasi gambar teknik dasar.
+                </p>
+                <button onclick="restartQuiz()" class="btn-bounce bg-pink-600 text-white font-bold px-6 py-3 rounded-2xl shadow-lg hover:bg-pink-700 transition inline-flex items-center gap-2 text-xs">
+                    <i class="fa-solid fa-rotate-right"></i> Ulangi Kuis
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-pink-200 px-2 py-2 sm:hidden">
+        <div class="flex justify-around items-center">
+            <button onclick="switchTab('beranda')" class="nav-item flex flex-col items-center gap-1 text-pink-600" data-tab="beranda">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px] font-medium">Beranda</span>
+            </button>
+            <button onclick="switchTab('peralatan')" class="nav-item flex flex-col items-center gap-1 text-slate-400 hover:text-pink-600" data-tab="peralatan">
+                <i class="fa-solid fa-pen-ruler text-lg"></i>
+                <span class="text-[10px] font-medium">Alat</span>
+            </button>
+            <button onclick="switchTab('garis')" class="nav-item flex flex-col items-center gap-1 text-slate-400 hover:text-pink-600" data-tab="garis">
+                <i class="fa-solid fa-grip-lines text-lg"></i>
+                <span class="text-[10px] font-medium">Garis</span>
+            </button>
+            <button onclick="switchTab('kertas')" class="nav-item flex flex-col items-center gap-1 text-slate-400 hover:text-pink-600" data-tab="kertas">
+                <i class="fa-solid fa-scroll text-lg"></i>
+                <span class="text-[10px] font-medium">Kertas</span>
+            </button>
+            <button onclick="switchTab('lab')" class="nav-item flex flex-col items-center gap-1 text-slate-400 hover:text-pink-600" data-tab="lab">
+                <i class="fa-solid fa-flask-vial text-lg"></i>
+                <span class="text-[10px] font-medium">Lab</span>
+            </button>
+            <button onclick="switchTab('kuis')" class="nav-item flex flex-col items-center gap-1 text-slate-400 hover:text-pink-600" data-tab="kuis">
+                <i class="fa-solid fa-gamepad text-lg"></i>
+                <span class="text-[10px] font-medium">Kuis</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        // --- SOUND EFFECTS (Web Audio API) ---
+        let audioEnabled = true;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!audioEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                } else if (type === 'correct') {
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'wrong') {
+                    osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.2);
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('audio-btn');
+            btn.innerHTML = audioEnabled 
+                ? '<i class="fa-solid fa-volume-high text-sm"></i>' 
+                : '<i class="fa-solid fa-volume-xmark text-sm text-slate-400"></i>';
+        }
+
+        // --- TAB NAVIGATION SYSTEM ---
+        function switchTab(tabId) {
+            playSound('click');
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+                tab.classList.remove('block');
+            });
+
+            // Show selected tab
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) {
+                targetTab.classList.remove('hidden');
+                targetTab.classList.add('block');
+            }
+
+            // Update mobile bottom nav active style
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.getAttribute('data-tab') === tabId) {
+                    item.classList.add('text-pink-600');
+                    item.classList.remove('text-slate-400');
+                } else {
+                    item.classList.remove('text-pink-600');
+                    item.classList.add('text-slate-400');
+                }
+            });
+
+            // Re-init canvas if switching to lab tab
+            if (tabId === 'lab') {
+                setTimeout(initCanvas, 100);
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- PROGRESS TRACKER ---
+        const completedItems = new Set();
+        const totalItems = 5;
+
+        function markComplete(id, btn) {
+            playSound('correct');
+            completedItems.add(id);
+            btn.classList.add('text-pink-500');
+            btn.classList.remove('text-slate-300');
+            
+            // Update progress
+            const percent = Math.round((completedItems.size / totalItems) * 100);
+            document.getElementById('progress-percent').innerText = `${percent}%`;
+            document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+        }
+
+        // --- PAPER DATA SELECTOR ---
+        const paperData = {
+            'A0': { dim: '841 x 1189 mm', border: 'Left: 20 mm | Lainnya: 10 mm' },
+            'A1': { dim: '594 x 841 mm', border: 'Left: 20 mm | Lainnya: 10 mm' },
+            'A2': { dim: '420 x 594 mm', border: 'Left: 20 mm | Lainnya: 10 mm' },
+            'A3': { dim: '297 x 420 mm', border: 'Left: 20 mm | Lainnya: 10 mm' },
+            'A4': { dim: '210 x 297 mm', border: 'Left: 20 mm | Lainnya: 5 mm (ISO)' }
+        };
+
+        function selectPaper(code) {
+            playSound('click');
+            // Reset styles
+            document.querySelectorAll('.paper-btn').forEach(btn => {
+                btn.className = 'paper-btn p-3 rounded-xl border text-center font-bold text-xs bg-white text-slate-700 hover:border-pink-500 hover:text-pink-600 transition';
+            });
+            event.currentTarget.className = 'paper-btn p-3 rounded-xl border-2 border-pink-500 text-center font-bold text-xs bg-pink-50 text-pink-600 transition shadow-sm';
+
+            document.getElementById('paper-title').innerText = `Kertas ${code}`;
+            document.getElementById('paper-dim').innerText = `Ukuran: ${paperData[code].dim}`;
+            document.getElementById('paper-border').innerText = `Garis Tepi Margin: ${paperData[code].border}`;
+        }
+
+        // --- LAB CANVAS SIMULATOR ---
+        let canvas, ctx, isDrawing = false;
+
+        function initCanvas() {
+            canvas = document.getElementById('drawing-canvas');
+            if (!canvas) return;
+            
+            ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            drawGrid();
+
+            // Event Listeners for Mouse & Touch
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+
+            canvas.addEventListener('touchstart', handleTouch(startDrawing));
+            canvas.addEventListener('touchmove', handleTouch(draw));
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function drawGrid() {
+            ctx.strokeStyle = '#fbcfe8';
+            ctx.lineWidth = 0.5;
+            const step = 20;
+
+            for (let x = 0; x < canvas.width; x += step) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += step) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+
+        function handleTouch(fn) {
+            return function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const mouseEvent = {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                };
+                fn(mouseEvent);
+            }
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            applyLineStyle();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function applyLineStyle() {
+            const style = document.getElementById('lab-line-style').value;
+            ctx.strokeStyle = '#e11d48';
+            ctx.setLineDash([]);
+
+            if (style === 'solid') {
+                ctx.lineWidth = 4;
+            } else if (style === 'thin') {
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#94a3b8';
+            } else if (style === 'dashed') {
+                ctx.lineWidth = 3;
+                ctx.setLineDash([10, 5]);
+            } else if (style === 'center') {
+                ctx.lineWidth = 2;
+                ctx.setLineDash([15, 4, 3, 4]);
+            }
+        }
+
+        function clearCanvas() {
+            playSound('click');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+        }
+
+        // --- QUIZ ENGINE ---
+        const questions = [
+            {
+                q: "Pensil dengan kode manakah yang memiliki tingkat kekerasan paling tinggi?",
+                options: ["4H", "2B", "HB", "6B"],
+                answer: 0,
+                explain: "Pensil berseri 'H' (Hard) makin besar angkanya makin keras garisnya."
+            },
+            {
+                q: "Jenis garis mana yang digunakan untuk menunjukkan garis sumbu simetri?",
+                options: ["Garis Tebal Kontinu", "Garis Bergores Titik (Chain Line)", "Garis Putus-putus", "Garis Bebas"],
+                answer: 1,
+                explain: "Garis bergores titik tipis digunakan khusus untuk lintasan & sumbu simetri."
+            },
+            {
+                q: "Di manakah letak resmi Etiket (Kepala Gambar) pada lembar kerja teknik?",
+                options: ["Sudut Kiri Atas", "Sudut Kanan Atas", "Sudut Kanan Bawah", "Tengah Bawah"],
+                answer: 2,
+                explain: "Etiket wajib diletakkan pada posisi sudut kanan bawah kertas gambar."
+            },
+            {
+                q: "Berapakah ukuran standar dimensi kertas gambar A4 menurut standar ISO?",
+                options: ["297 x 420 mm", "210 x 297 mm", "148 x 210 mm", "420 x 594 mm"],
+                answer: 1,
+                explain: "Ukuran standar kertas A4 adalah 210 mm x 297 mm."
+            },
+            {
+                q: "Garis tebal kontinu (0.5 - 0.7mm) digunakan untuk menggambarkan...?",
+                options: ["Garis Bayangan", "Garis Ukur", "Garis Benda Nyata / Terlihat", "Garis Arsir"],
+                answer: 2,
+                explain: "Garis tebal kontinu digunakan untuk kontur dan batas nyata benda yang terlihat."
+            }
+        ];
+
+        let currentQ = 0;
+        let quizScore = 0;
+
+        function loadQuestion() {
+            const q = questions[currentQ];
+            document.getElementById('quiz-step').innerText = `Soal ${currentQ + 1}/${questions.length}`;
+            document.getElementById('quiz-question').innerText = q.q;
+
+            const optsContainer = document.getElementById('quiz-options');
+            optsContainer.innerHTML = '';
+
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('next-quiz-btn').classList.add('hidden');
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3.5 rounded-2xl border border-pink-200 bg-white hover:bg-pink-50 hover:border-pink-400 font-medium text-xs text-slate-700 transition flex items-center justify-between';
+                btn.innerHTML = `<span>${opt}</span> <i class="fa-regular fa-circle text-pink-300"></i>`;
+                btn.onclick = () => checkAnswer(idx, btn);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx, btnElement) {
+            const q = questions[currentQ];
+            const opts = document.getElementById('quiz-options').children;
+
+            // Disable all option buttons
+            for (let b of opts) {
+                b.disabled = true;
+            }
+
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden');
+
+            if (selectedIdx === q.answer) {
+                playSound('correct');
+                quizScore += 20;
+                btnElement.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-xs transition flex items-center justify-between';
+                btnElement.querySelector('i').className = 'fa-solid fa-circle-check text-emerald-600';
+                
+                feedback.className = 'p-4 rounded-2xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200';
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Benar! ${q.explain}`;
+            } else {
+                playSound('wrong');
+                btnElement.className = 'w-full text-left p-3.5 rounded-2xl border-2 border-rose-500 bg-rose-50 text-rose-800 font-semibold text-xs transition flex items-center justify-between';
+                btnElement.querySelector('i').className = 'fa-solid fa-circle-xmark text-rose-600';
+
+                // Highlight correct one
+                opts[q.answer].className = 'w-full text-left p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-xs flex items-center justify-between';
+
+                feedback.className = 'p-4 rounded-2xl text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-200';
+                feedback.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Kurang Tepat. ${q.explain}`;
+            }
+
+            document.getElementById('next-quiz-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            currentQ++;
+            if (currentQ < questions.length) {
+                loadQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            const resCard = document.getElementById('quiz-result');
+            resCard.classList.remove('hidden');
+
+            document.getElementById('result-score').innerText = `${quizScore} / 100`;
+
+            if (quizScore >= 80) {
+                playSound('correct');
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('result-msg').innerText = "Luar biasa! Anda telah menguasai konsep Gambar Teknik Dasar dengan sangat baik!";
+            } else {
+                document.getElementById('result-msg').innerText = "Bagus! Pelajari kembali materi modul dan coba ulangi kuis untuk hasil maksimal.";
+            }
+        }
+
+        function restartQuiz() {
+            playSound('click');
+            currentQ = 0;
+            quizScore = 0;
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        // --- WINDOW LOAD INITIALIZATION ---
+        window.onload = function() {
+            loadQuestion();
+            initCanvas();
+        };
+
+        window.onresize = function() {
+            if (canvas) initCanvas();
+        };
+    </script>
+</body>
+</html>
